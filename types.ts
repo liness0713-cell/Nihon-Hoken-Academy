@@ -1,9 +1,10 @@
+
 export enum InsuranceCategory {
-  LIFE = 'Seimei (Life)',
-  MEDICAL = 'Iryo (Medical)',
-  CANCER = 'Gan (Cancer)',
-  CAR = 'Jidosha (Car)',
-  FIRE = 'Kasai (Fire)'
+  LIFE = '终身保险 / Life / 生命保険(せいめいほけん)',
+  MEDICAL = '医疗保险 / Medical / 医療保険(いりょうほけん)',
+  CANCER = '癌症保险 / Cancer / がん保険(がんほけん)',
+  CAR = '汽车保险 / Car / 自動車保険(じどうしゃほけん)',
+  FIRE = '火灾保险 / Fire / 火災保険(かさいほけん)'
 }
 
 export interface InsuranceProduct {

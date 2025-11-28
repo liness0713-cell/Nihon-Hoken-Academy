@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { ViewState, Policy, Claim, InsuranceCategory } from './types';
 import { MOCK_PRODUCTS, CATEGORY_ICONS } from './constants';
@@ -17,24 +18,53 @@ import {
   Loader2
 } from 'lucide-react';
 
-// --- Sub-components defined in same file for single-file restriction compliance mostly, separated logically ---
+// --- Sub-components ---
 
 // 1. Navigation Bar
 const Navbar: React.FC<{ currentView: ViewState; setView: (v: ViewState) => void }> = ({ currentView, setView }) => (
   <nav className="bg-slate-900 text-white shadow-lg sticky top-0 z-50">
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div className="flex items-center justify-between h-16">
+      <div className="flex items-center justify-between h-20">
         <div className="flex items-center cursor-pointer" onClick={() => setView('HOME')}>
-          <ShieldCheck className="h-8 w-8 text-blue-400 mr-2" />
-          <span className="font-bold text-xl tracking-wide">Nihon Hoken Academy</span>
+          <ShieldCheck className="h-8 w-8 text-blue-400 mr-2 flex-shrink-0" />
+          <div className="flex flex-col">
+            <span className="font-bold text-lg tracking-wide leading-tight">日本保险学院</span>
+            <span className="text-xs text-slate-400">Nihon Hoken Academy</span>
+            <span className="text-[10px] text-slate-500">日本保険(にほんほけん)アカデミー</span>
+          </div>
         </div>
         <div className="hidden md:block">
-          <div className="ml-10 flex items-baseline space-x-4">
-            <NavButton label="商品一覧 (Products)" active={currentView === 'PRODUCTS'} onClick={() => setView('PRODUCTS')} />
-            <NavButton label="学習 (Learn)" active={currentView === 'LEARN'} onClick={() => setView('LEARN')} />
-            <NavButton label="試算 (Simulation)" active={currentView === 'SIMULATION'} onClick={() => setView('SIMULATION')} />
-            <NavButton label="マイページ (My Page)" active={currentView === 'MY_PAGE'} onClick={() => setView('MY_PAGE')} />
-            <NavButton label="事故・請求 (Claims)" active={currentView === 'CLAIMS_CENTER'} onClick={() => setView('CLAIMS_CENTER')} />
+          <div className="ml-10 flex items-baseline space-x-2">
+            <NavButton 
+              title="商品 / Products" 
+              sub="商品(しょうひん)" 
+              active={currentView === 'PRODUCTS'} 
+              onClick={() => setView('PRODUCTS')} 
+            />
+            <NavButton 
+              title="学习 / Learn" 
+              sub="学習(がくしゅう)" 
+              active={currentView === 'LEARN'} 
+              onClick={() => setView('LEARN')} 
+            />
+            <NavButton 
+              title="试算 / Quote" 
+              sub="試算(しさん)" 
+              active={currentView === 'SIMULATION'} 
+              onClick={() => setView('SIMULATION')} 
+            />
+            <NavButton 
+              title="主页 / My Page" 
+              sub="マイページ" 
+              active={currentView === 'MY_PAGE'} 
+              onClick={() => setView('MY_PAGE')} 
+            />
+            <NavButton 
+              title="理赔 / Claims" 
+              sub="請求(せいきゅう)" 
+              active={currentView === 'CLAIMS_CENTER'} 
+              onClick={() => setView('CLAIMS_CENTER')} 
+            />
           </div>
         </div>
       </div>
@@ -42,14 +72,15 @@ const Navbar: React.FC<{ currentView: ViewState; setView: (v: ViewState) => void
   </nav>
 );
 
-const NavButton: React.FC<{ label: string; active: boolean; onClick: () => void }> = ({ label, active, onClick }) => (
+const NavButton: React.FC<{ title: string; sub: string; active: boolean; onClick: () => void }> = ({ title, sub, active, onClick }) => (
   <button
     onClick={onClick}
-    className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+    className={`px-3 py-2 rounded-md text-sm font-medium transition-colors flex flex-col items-center leading-none gap-1 ${
       active ? 'bg-blue-700 text-white' : 'text-slate-300 hover:bg-slate-800 hover:text-white'
     }`}
   >
-    {label}
+    <span>{title}</span>
+    <span className="text-[10px] opacity-70">{sub}</span>
   </button>
 );
 
@@ -59,25 +90,31 @@ const HomeView: React.FC<{ setView: (v: ViewState) => void }> = ({ setView }) =>
     {/* Hero */}
     <div className="relative bg-gradient-to-r from-blue-900 to-slate-800 text-white overflow-hidden rounded-b-3xl shadow-2xl">
       <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?q=80&w=2070&auto=format&fit=crop')] opacity-10 bg-cover bg-center" />
-      <div className="relative max-w-7xl mx-auto px-4 py-24 sm:px-6 lg:px-8 flex flex-col items-center text-center">
-        <h1 className="text-4xl sm:text-6xl font-extrabold tracking-tight mb-6">
-          日本の保険を、<span className="text-blue-400">体験</span>しよう。
+      <div className="relative max-w-7xl mx-auto px-4 py-20 sm:px-6 lg:px-8 flex flex-col items-center text-center">
+        <h1 className="text-3xl sm:text-5xl font-extrabold tracking-tight mb-4 flex flex-col gap-2">
+          <span>体验日本保险</span>
+          <span className="text-2xl sm:text-3xl font-light text-blue-200">Experience Japanese Insurance</span>
+          <span className="text-xl sm:text-2xl text-blue-400">日本(にほん)の保険(ほけん)を体験(たいけん)しよう</span>
         </h1>
-        <p className="max-w-2xl text-lg sm:text-xl text-slate-300 mb-8">
-          A fully interactive simulator for the Japanese Insurance Market. Learn about products, simulate underwriting, manage policies, and experience the claims process with AI.
+        <p className="max-w-3xl text-base sm:text-lg text-slate-300 mb-8 leading-relaxed">
+          一个全互动的日本保险市场模拟器。学习产品，模拟核保，管理保单，并通过AI体验理赔流程。<br/>
+          A fully interactive simulator. Learn, simulate underwriting, manage policies, and experience claims with AI.<br/>
+          完全(かんぜん)対話型(たいわがた)のシミュレーター。商品(しょうひん)を学(まな)び、引受(ひきうけ)を試算(しさん)し、AIで請求(せいきゅう)を体験(たいけん)しましょう。
         </p>
-        <div className="flex gap-4">
+        <div className="flex flex-wrap justify-center gap-4">
           <button 
             onClick={() => setView('PRODUCTS')}
-            className="px-8 py-3 bg-blue-600 hover:bg-blue-500 rounded-full font-bold shadow-lg transition-transform hover:-translate-y-1"
+            className="px-8 py-3 bg-blue-600 hover:bg-blue-500 rounded-full font-bold shadow-lg transition-transform hover:-translate-y-1 flex flex-col items-center"
           >
-            Start Learning
+            <span>开始学习 / Start</span>
+            <span className="text-xs font-normal opacity-80">学習(がくしゅう)を始(はじ)める</span>
           </button>
           <button 
             onClick={() => setView('SIMULATION')}
-            className="px-8 py-3 bg-white text-blue-900 hover:bg-slate-100 rounded-full font-bold shadow-lg transition-transform hover:-translate-y-1"
+            className="px-8 py-3 bg-white text-blue-900 hover:bg-slate-100 rounded-full font-bold shadow-lg transition-transform hover:-translate-y-1 flex flex-col items-center"
           >
-            Get a Quote
+            <span>获取报价 / Quote</span>
+            <span className="text-xs font-normal opacity-80">見積(みつ)もりをとる</span>
           </button>
         </div>
       </div>
@@ -88,18 +125,18 @@ const HomeView: React.FC<{ setView: (v: ViewState) => void }> = ({ setView }) =>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
         <FeatureCard 
           icon={<BookOpen className="h-8 w-8 text-indigo-500" />}
-          title="Product Knowledge"
-          desc="Explore various categories like Seimei (Life), Iryo (Medical), and Gan (Cancer) insurance."
+          title="产品知识 / Knowledge / 商品知識(しょうひんちしき)"
+          desc="探索各类保险，如终身保险、医疗保险和癌症保险。<br>Explore categories like Seimei, Iryo, and Gan insurance.<br>生命(せいめい)、医療(いりょう)、がん保険(ほけん)などを探索(たんさく)。"
         />
         <FeatureCard 
           icon={<UserCheck className="h-8 w-8 text-green-500" />}
-          title="Policy Admin (Hozen)"
-          desc="Manage your virtual portfolio. Experience address changes, beneficiary updates, and policy loans."
+          title="保单管理 / Admin / 保全(ほぜん)"
+          desc="管理您的虚拟投资组合。体验地址变更和受益人更新。<br>Manage your virtual portfolio. Address & beneficiary changes.<br>契約(けいやく)を管理(かんり)。住所変更(じゅうしょへんこう)などを体験(たいけん)。"
         />
         <FeatureCard 
           icon={<AlertTriangle className="h-8 w-8 text-orange-500" />}
-          title="Claims (Satei)"
-          desc="Submit accident reports and watch the AI adjuster determine your payout based on policy terms."
+          title="理赔核定 / Claims / 査定(さてい)"
+          desc="提交事故报告，观看AI理赔员根据条款确定赔付。<br>Submit reports and watch AI adjusters determine payout.<br>事故(じこ)を報告(ほうこく)し、AIによる支払(しはら)い査定(さてい)を見(み)る。"
         />
       </div>
     </div>
@@ -107,12 +144,12 @@ const HomeView: React.FC<{ setView: (v: ViewState) => void }> = ({ setView }) =>
 );
 
 const FeatureCard: React.FC<{ icon: React.ReactNode; title: string; desc: string }> = ({ icon, title, desc }) => (
-  <div className="bg-white p-6 rounded-xl shadow-md hover:shadow-xl transition-shadow border border-slate-100">
+  <div className="bg-white p-6 rounded-xl shadow-md hover:shadow-xl transition-shadow border border-slate-100 h-full">
     <div className="mb-4 bg-slate-50 w-14 h-14 rounded-full flex items-center justify-center">
       {icon}
     </div>
-    <h3 className="text-xl font-bold text-slate-900 mb-2">{title}</h3>
-    <p className="text-slate-600">{desc}</p>
+    <h3 className="text-lg font-bold text-slate-900 mb-2 leading-snug">{title}</h3>
+    <p className="text-sm text-slate-600 leading-relaxed" dangerouslySetInnerHTML={{__html: desc}} />
   </div>
 );
 
@@ -120,8 +157,8 @@ const FeatureCard: React.FC<{ icon: React.ReactNode; title: string; desc: string
 const ProductsView: React.FC = () => (
   <div className="max-w-7xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
     <div className="mb-8">
-      <h2 className="text-3xl font-bold text-slate-900">Insurance Products (商品一覧)</h2>
-      <p className="text-slate-600 mt-2">Browse available insurance types in the Japanese market.</p>
+      <h2 className="text-2xl font-bold text-slate-900">保险产品列表 / Insurance Products / 商品一覧(しょうひんいちらん)</h2>
+      <p className="text-slate-600 mt-2">浏览日本市场现有的保险类型。<br/>Browse available insurance types.<br/>日本市場(にほんしじょう)の保険(ほけん)タイプを閲覧(えつらん)。</p>
     </div>
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
       {MOCK_PRODUCTS.map((prod) => (
@@ -129,13 +166,13 @@ const ProductsView: React.FC = () => (
           <div className="p-6">
             <div className="flex items-center gap-2 mb-4">
               {CATEGORY_ICONS[prod.category]}
-              <span className="text-sm font-semibold text-slate-500 uppercase tracking-wider">{prod.category}</span>
+              <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">{prod.category.split('/')[2]}</span>
             </div>
-            <h3 className="text-xl font-bold text-slate-900 mb-2">{prod.name}</h3>
-            <p className="text-slate-600 mb-4 h-12 line-clamp-2">{prod.description}</p>
-            <div className="space-y-2 mb-6">
+            <h3 className="text-lg font-bold text-slate-900 mb-2 leading-snug">{prod.name}</h3>
+            <p className="text-sm text-slate-600 mb-4 h-auto min-h-[3rem]">{prod.description}</p>
+            <div className="space-y-3 mb-6">
               {prod.coveragePoints.map((pt, idx) => (
-                <div key={idx} className="flex items-start text-sm text-slate-700">
+                <div key={idx} className="flex items-start text-xs text-slate-700">
                   <CheckCircle2 className="w-4 h-4 text-green-500 mr-2 mt-0.5 flex-shrink-0" />
                   <span>{pt}</span>
                 </div>
@@ -148,7 +185,7 @@ const ProductsView: React.FC = () => (
   </div>
 );
 
-// 4. Learning Center (Gemini Powered)
+// 4. Learning Center
 const LearnView: React.FC = () => {
   const [topic, setTopic] = useState('');
   const [explanation, setExplanation] = useState<string | null>(null);
@@ -163,17 +200,22 @@ const LearnView: React.FC = () => {
     setLoading(false);
   };
 
-  const commonTopics = ["Teiki Hoken (Term Life)", "Kaiyaku Henreikin (Surrender Value)", "Senshin Iryo (Advanced Medical)", "Koujo (Deduction)"];
+  const commonTopics = [
+    "定期保险 / Term Life / 定期保険(ていきほけん)",
+    "解约返还金 / Surrender Value / 解約返戻金(かいやくへんれいきん)",
+    "先进医疗 / Advanced Medical / 先進医療(せんしんいりょう)",
+    "免责金额 / Deductible / 免責金額(めんせききんがく)"
+  ];
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-8">
-      <h2 className="text-3xl font-bold text-slate-900 mb-6">Insurance Knowledge Base</h2>
+      <h2 className="text-2xl font-bold text-slate-900 mb-6">保险知识库 / Knowledge Base / 保険(ほけん)知識(ちしき)</h2>
       <div className="bg-white p-8 rounded-2xl shadow-lg border border-slate-200">
-        <div className="flex gap-4 mb-6">
+        <div className="flex gap-4 mb-6 flex-col sm:flex-row">
           <input 
             type="text" 
-            placeholder="Ask about a Japanese insurance term (e.g., 'Shushin Hoken')" 
-            className="flex-1 px-4 py-3 bg-white rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+            placeholder="输入保险术语 / Enter term / 保険用語(ほけんようご)を入力(にゅうりょく)" 
+            className="flex-1 px-4 py-3 bg-white rounded-lg border border-slate-300 focus:ring-2 focus:ring-blue-500 focus:outline-none placeholder:text-xs"
             value={topic}
             onChange={(e) => setTopic(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
@@ -181,10 +223,10 @@ const LearnView: React.FC = () => {
           <button 
             onClick={handleSearch}
             disabled={loading}
-            className="px-6 py-3 bg-blue-600 text-white rounded-lg font-bold hover:bg-blue-700 disabled:opacity-50 flex items-center gap-2"
+            className="px-6 py-3 bg-blue-600 text-white rounded-lg font-bold hover:bg-blue-700 disabled:opacity-50 flex items-center justify-center gap-2 whitespace-nowrap"
           >
             {loading ? <Loader2 className="animate-spin" /> : <Search className="w-5 h-5" />}
-            Ask AI
+            <span>问AI / Ask / 質問(しつもん)</span>
           </button>
         </div>
         
@@ -192,8 +234,8 @@ const LearnView: React.FC = () => {
             {commonTopics.map(t => (
               <button 
                 key={t}
-                onClick={() => setTopic(t)}
-                className="px-3 py-1 bg-slate-100 text-slate-600 text-xs rounded-full hover:bg-slate-200"
+                onClick={() => setTopic(t.split(' / ')[0])}
+                className="px-3 py-1.5 bg-slate-100 text-slate-600 text-xs rounded-full hover:bg-slate-200 border border-slate-200 transition-colors text-left"
               >
                 {t}
               </button>
@@ -204,9 +246,9 @@ const LearnView: React.FC = () => {
           <div className="mt-8 p-6 bg-slate-50 rounded-xl border border-slate-200 prose prose-blue max-w-none">
              <h3 className="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
                 <BookOpen className="w-5 h-5 text-blue-600"/>
-                AI Explanation
+                AI 解说 / AI Explanation / AI解説(かいせつ)
              </h3>
-             <div className="whitespace-pre-line text-slate-700 leading-relaxed">
+             <div className="whitespace-pre-line text-slate-700 leading-relaxed text-sm">
                {explanation}
              </div>
           </div>
@@ -218,7 +260,7 @@ const LearnView: React.FC = () => {
 
 // 5. Simulation & Underwriting
 const SimulationView: React.FC<{ addPolicy: (p: Policy) => void; setView: (v: ViewState) => void }> = ({ addPolicy, setView }) => {
-  const [formData, setFormData] = useState({ age: 30, gender: 'Male', category: InsuranceCategory.MEDICAL, needs: 'Focus on surgery and cancer coverage' });
+  const [formData, setFormData] = useState({ age: 30, gender: '男 / Male / 男性', category: InsuranceCategory.MEDICAL, needs: '希望加强手术和癌症保障 / Focus on surgery & cancer / 手術(しゅじゅつ)とがん保障(ほしょう)を重視(じゅうし)' });
   const [loading, setLoading] = useState(false);
   const [proposal, setProposal] = useState<any>(null);
 
@@ -236,13 +278,13 @@ const SimulationView: React.FC<{ addPolicy: (p: Policy) => void; setView: (v: Vi
       productId: 'custom_ai_prod',
       productName: proposal.planName,
       category: formData.category,
-      contractorName: 'Yamada Taro (You)',
-      insuredName: 'Yamada Taro (You)',
-      beneficiary: 'Yamada Hanako',
+      contractorName: '山田 太郎 / Yamada Taro',
+      insuredName: '山田 太郎 / Yamada Taro',
+      beneficiary: '山田 花子 / Yamada Hanako',
       startDate: new Date().toISOString().split('T')[0],
       status: 'Active',
       premium: proposal.premium,
-      coverageAmount: proposal.coverageDetails.substring(0, 50) + '...', // Simplified
+      coverageAmount: proposal.coverageDetails.split('\n')[0] || '详见条款 / See details / 詳細(しょうさい)参照(さんしょう)',
       specialConditions: proposal.coverageDetails
     };
     addPolicy(newPolicy);
@@ -252,12 +294,12 @@ const SimulationView: React.FC<{ addPolicy: (p: Policy) => void; setView: (v: Vi
   return (
     <div className="max-w-5xl mx-auto px-4 py-8 grid grid-cols-1 lg:grid-cols-2 gap-8">
       <div>
-        <h2 className="text-3xl font-bold text-slate-900 mb-6">Get a Quote (試算)</h2>
+        <h2 className="text-2xl font-bold text-slate-900 mb-6">保费试算 / Get a Quote / 試算(しさん)</h2>
         <div className="bg-white p-6 rounded-2xl shadow-md border border-slate-200 space-y-4">
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">Category</label>
+            <label className="block text-sm font-medium text-slate-700 mb-1">保险类别 / Category / 保険種類(ほけんしゅるい)</label>
             <select 
-              className="w-full bg-white border-slate-300 rounded-lg p-2 border focus:ring-blue-500"
+              className="w-full bg-white border-slate-300 rounded-lg p-2 border focus:ring-blue-500 text-sm"
               value={formData.category}
               onChange={(e) => setFormData({...formData, category: e.target.value as InsuranceCategory})}
             >
@@ -266,7 +308,7 @@ const SimulationView: React.FC<{ addPolicy: (p: Policy) => void; setView: (v: Vi
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">Age</label>
+              <label className="block text-sm font-medium text-slate-700 mb-1">年龄 / Age / 年齢(ねんれい)</label>
               <input 
                 type="number" 
                 className="w-full bg-white border-slate-300 rounded-lg p-2 border" 
@@ -275,24 +317,24 @@ const SimulationView: React.FC<{ addPolicy: (p: Policy) => void; setView: (v: Vi
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">Gender</label>
+              <label className="block text-sm font-medium text-slate-700 mb-1">性别 / Gender / 性別(せいべつ)</label>
               <select 
-                className="w-full bg-white border-slate-300 rounded-lg p-2 border"
+                className="w-full bg-white border-slate-300 rounded-lg p-2 border text-sm"
                 value={formData.gender}
                 onChange={(e) => setFormData({...formData, gender: e.target.value})}
               >
-                <option>Male</option>
-                <option>Female</option>
+                <option>男 / Male / 男性(だんせい)</option>
+                <option>女 / Female / 女性(じょせい)</option>
               </select>
             </div>
           </div>
           <div>
-             <label className="block text-sm font-medium text-slate-700 mb-1">Specific Needs / Concerns</label>
+             <label className="block text-sm font-medium text-slate-700 mb-1">需求与顾虑 / Needs / ニーズ・懸念(けねん)</label>
              <textarea 
-               className="w-full bg-white border-slate-300 rounded-lg p-2 border h-24"
+               className="w-full bg-white border-slate-300 rounded-lg p-2 border h-24 text-sm"
                value={formData.needs}
                onChange={(e) => setFormData({...formData, needs: e.target.value})}
-               placeholder="e.g., I am worried about cancer running in my family."
+               placeholder="e.g. 担心家族癌症史 / Worried about family cancer history / がん家系(かけい)が心配(しんぱい)"
              />
           </div>
           <button 
@@ -301,42 +343,48 @@ const SimulationView: React.FC<{ addPolicy: (p: Policy) => void; setView: (v: Vi
             className="w-full py-3 bg-blue-600 text-white rounded-lg font-bold hover:bg-blue-700 disabled:opacity-50 flex justify-center items-center gap-2"
           >
             {loading ? <Loader2 className="animate-spin" /> : <FileText className="w-5 h-5" />}
-            Generate Plan with AI
+            <span className="flex flex-col items-center leading-none text-sm">
+              <span>生成计划 / Generate Plan</span>
+              <span className="text-[10px] font-normal opacity-80">プランを作成(さくせい)</span>
+            </span>
           </button>
         </div>
       </div>
 
       <div className="flex flex-col h-full">
-         <h2 className="text-3xl font-bold text-slate-900 mb-6 lg:invisible">Results</h2>
+         <h2 className="text-2xl font-bold text-slate-900 mb-6 lg:invisible">Results</h2>
          {proposal ? (
            <div className="bg-white p-6 rounded-2xl shadow-xl border-t-4 border-blue-500 flex-1 flex flex-col animate-fade-in">
              <div className="mb-4">
-               <span className="text-xs font-bold text-blue-600 bg-blue-50 px-2 py-1 rounded uppercase tracking-wide">Proposed Plan</span>
-               <h3 className="text-2xl font-bold text-slate-900 mt-1">{proposal.planName}</h3>
-               <p className="text-3xl font-bold text-slate-900 mt-4">¥{proposal.premium.toLocaleString()} <span className="text-sm font-normal text-slate-500">/ month</span></p>
+               <span className="text-xs font-bold text-blue-600 bg-blue-50 px-2 py-1 rounded uppercase tracking-wide">建议方案 / Proposal / 提案(ていあん)</span>
+               <h3 className="text-xl font-bold text-slate-900 mt-2">{proposal.planName}</h3>
+               <p className="text-3xl font-bold text-slate-900 mt-4">¥{proposal.premium.toLocaleString()} <span className="text-sm font-normal text-slate-500">/ 月 (Month/月)</span></p>
              </div>
              
-             <div className="space-y-4 mb-8 flex-1">
+             <div className="space-y-4 mb-8 flex-1 overflow-y-auto max-h-80">
                <div className="p-4 bg-slate-50 rounded-lg">
-                 <h4 className="font-semibold text-slate-800 mb-2">Coverage Highlights</h4>
-                 <p className="text-sm text-slate-600 whitespace-pre-wrap">{proposal.coverageDetails}</p>
+                 <h4 className="font-semibold text-slate-800 mb-2 text-sm">保障亮点 / Coverage / 保障内容(ほしょうないよう)</h4>
+                 <p className="text-sm text-slate-600 whitespace-pre-wrap leading-relaxed">{proposal.coverageDetails}</p>
                </div>
                <div className="p-4 bg-yellow-50 rounded-lg border border-yellow-100">
-                 <h4 className="font-semibold text-yellow-800 mb-2">AI Advisor</h4>
-                 <p className="text-sm text-yellow-700 italic">"{proposal.advice}"</p>
+                 <h4 className="font-semibold text-yellow-800 mb-2 text-sm">AI 顾问 / Advisor / AIアドバイザー</h4>
+                 <p className="text-sm text-yellow-700 italic leading-relaxed">"{proposal.advice}"</p>
                </div>
              </div>
 
              <button 
                onClick={handleApply}
-               className="w-full py-3 bg-green-600 text-white rounded-lg font-bold hover:bg-green-700 shadow-lg transform transition hover:-translate-y-1"
+               className="w-full py-3 bg-green-600 text-white rounded-lg font-bold hover:bg-green-700 shadow-lg transform transition hover:-translate-y-1 flex flex-col items-center justify-center leading-none gap-1"
              >
-               Apply for this Policy (Contract)
+               <span>申请投保 / Apply</span>
+               <span className="text-xs font-normal opacity-80">申(もう)し込(こ)む</span>
              </button>
            </div>
          ) : (
-           <div className="h-full bg-slate-100 rounded-2xl border-2 border-dashed border-slate-300 flex items-center justify-center text-slate-400 p-8 text-center">
-             Run the simulation to see a tailored insurance proposal here.
+           <div className="h-full bg-slate-100 rounded-2xl border-2 border-dashed border-slate-300 flex items-center justify-center text-slate-400 p-8 text-center text-sm">
+             运行模拟以查看量身定制的保险建议。<br/>
+             Run simulation to see proposal.<br/>
+             シミュレーションを実行(じっこう)して提案(ていあん)を見(み)る。
            </div>
          )}
       </div>
@@ -347,13 +395,13 @@ const SimulationView: React.FC<{ addPolicy: (p: Policy) => void; setView: (v: Vi
 // 6. My Page (Admin)
 const MyPageView: React.FC<{ policies: Policy[] }> = ({ policies }) => (
   <div className="max-w-6xl mx-auto px-4 py-8">
-     <div className="flex justify-between items-end mb-8">
+     <div className="flex flex-col sm:flex-row justify-between items-end mb-8 gap-4">
       <div>
-        <h2 className="text-3xl font-bold text-slate-900">My Page (契約者専用ページ)</h2>
-        <p className="text-slate-600 mt-1">Manage your active contracts and procedures.</p>
+        <h2 className="text-2xl font-bold text-slate-900">我的主页 / My Page / マイページ</h2>
+        <p className="text-slate-600 mt-1 text-sm">管理您的有效合同和手续。<br/>Manage active contracts.<br/>契約(けいやく)と手続(てつづ)きを管理(かんり)。</p>
       </div>
-      <div className="text-right">
-        <p className="text-sm text-slate-500">Total Monthly Premium</p>
+      <div className="text-right bg-slate-100 p-4 rounded-lg">
+        <p className="text-xs text-slate-500">月保费总额 / Total Monthly / 月額合計(げつがくごうけい)</p>
         <p className="text-2xl font-bold text-slate-900">
           ¥{policies.reduce((acc, p) => acc + (p.status === 'Active' ? p.premium : 0), 0).toLocaleString()}
         </p>
@@ -365,8 +413,8 @@ const MyPageView: React.FC<{ policies: Policy[] }> = ({ policies }) => (
         <div className="inline-block p-4 bg-slate-100 rounded-full mb-4">
           <FileText className="w-8 h-8 text-slate-400" />
         </div>
-        <h3 className="text-lg font-medium text-slate-900">No Active Policies</h3>
-        <p className="text-slate-500">Go to Simulation to create a new contract.</p>
+        <h3 className="text-lg font-medium text-slate-900">暂无有效保单 / No Policies / 契約(けいやく)なし</h3>
+        <p className="text-slate-500">去“试算”创建新合同。<br/>Go to Simulation to create one.<br/>試算(しさん)で契約(けいやく)を作成(さくせい)。</p>
       </div>
     ) : (
       <div className="grid gap-6">
@@ -377,11 +425,11 @@ const MyPageView: React.FC<{ policies: Policy[] }> = ({ policies }) => (
                  <div className="flex items-center gap-3">
                    {CATEGORY_ICONS[policy.category]}
                    <div>
-                     <h3 className="text-lg font-bold text-slate-900">{policy.productName}</h3>
-                     <p className="text-xs text-slate-500">ID: {policy.id}</p>
+                     <h3 className="text-lg font-bold text-slate-900 leading-snug">{policy.productName}</h3>
+                     <p className="text-xs text-slate-500 font-mono">ID: {policy.id}</p>
                    </div>
                  </div>
-                 <span className={`px-3 py-1 rounded-full text-xs font-bold ${
+                 <span className={`px-3 py-1 rounded-full text-xs font-bold whitespace-nowrap ${
                    policy.status === 'Active' ? 'bg-green-100 text-green-800' : 
                    policy.status === 'Claimed' ? 'bg-purple-100 text-purple-800' : 'bg-slate-100 text-slate-800'
                  }`}>
@@ -389,40 +437,40 @@ const MyPageView: React.FC<{ policies: Policy[] }> = ({ policies }) => (
                  </span>
                </div>
                
-               <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm mt-4">
+               <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-xs sm:text-sm mt-4">
                  <div>
-                   <p className="text-slate-500">Insured</p>
+                   <p className="text-slate-500 text-[10px] uppercase">被保人 / Insured / 被保険者</p>
                    <p className="font-medium">{policy.insuredName}</p>
                  </div>
                  <div>
-                   <p className="text-slate-500">Beneficiary</p>
+                   <p className="text-slate-500 text-[10px] uppercase">受益人 / Beneficiary / 受取人</p>
                    <p className="font-medium">{policy.beneficiary}</p>
                  </div>
                  <div>
-                   <p className="text-slate-500">Monthly Premium</p>
+                   <p className="text-slate-500 text-[10px] uppercase">月保费 / Premium / 保険料</p>
                    <p className="font-medium">¥{policy.premium.toLocaleString()}</p>
                  </div>
                  <div>
-                    <p className="text-slate-500">Start Date</p>
+                    <p className="text-slate-500 text-[10px] uppercase">生效日 / Start / 開始日</p>
                     <p className="font-medium">{policy.startDate}</p>
                  </div>
                </div>
                
                <div className="mt-4 pt-4 border-t border-slate-100">
-                 <p className="text-xs text-slate-500 mb-1">Coverage Details</p>
-                 <p className="text-sm text-slate-700">{policy.specialConditions}</p>
+                 <p className="text-xs text-slate-500 mb-1">保障内容 / Coverage Details / 保障内容</p>
+                 <p className="text-sm text-slate-700 whitespace-pre-wrap">{policy.specialConditions}</p>
                </div>
              </div>
              
-             <div className="bg-slate-50 p-6 flex flex-col justify-center gap-2 border-l border-slate-100 min-w-[200px]">
-                <button className="w-full py-2 px-4 bg-white border border-slate-300 text-slate-700 rounded text-sm hover:bg-slate-50 font-medium">
-                  Address Change
+             <div className="bg-slate-50 p-6 flex flex-col justify-center gap-2 border-l border-slate-100 min-w-[220px]">
+                <button className="w-full py-2 px-4 bg-white border border-slate-300 text-slate-700 rounded text-xs hover:bg-slate-50 font-medium text-left">
+                  地址变更 / Address Change<br/>住所変更(じゅうしょへんこう)
                 </button>
-                <button className="w-full py-2 px-4 bg-white border border-slate-300 text-slate-700 rounded text-sm hover:bg-slate-50 font-medium">
-                  Beneficiary Change
+                <button className="w-full py-2 px-4 bg-white border border-slate-300 text-slate-700 rounded text-xs hover:bg-slate-50 font-medium text-left">
+                  受益人变更 / Beneficiary Change<br/>受取人変更(うけとりにんへんこう)
                 </button>
-                <button className="w-full py-2 px-4 bg-white border border-slate-300 text-slate-700 rounded text-sm hover:bg-slate-50 font-medium text-red-600 hover:text-red-700 hover:border-red-200">
-                   Surrender (Kaiyaku)
+                <button className="w-full py-2 px-4 bg-white border border-slate-300 text-slate-700 rounded text-xs hover:bg-slate-50 font-medium text-red-600 hover:text-red-700 hover:border-red-200 text-left">
+                   解约 / Surrender<br/>解約(かいやく)
                 </button>
              </div>
           </div>
@@ -468,31 +516,33 @@ const ClaimsView: React.FC<{ policies: Policy[]; addClaim: (c: Claim) => void; c
     <div className="max-w-6xl mx-auto px-4 py-8 grid grid-cols-1 lg:grid-cols-2 gap-8">
        {/* Submission Form */}
        <div>
-         <h2 className="text-3xl font-bold text-slate-900 mb-6">File a Claim (事故報告)</h2>
+         <h2 className="text-2xl font-bold text-slate-900 mb-6">申请理赔 / File Claim / 事故報告(じこほうこく)</h2>
          <div className="bg-white p-6 rounded-2xl shadow-md border border-slate-200">
             {activePolicies.length === 0 ? (
-              <div className="text-center py-8 text-slate-500">You need an active policy to file a claim.</div>
+              <div className="text-center py-8 text-slate-500 text-sm">
+                需要有效的保单才能申请理赔。<br/>Need active policy.<br/>有効(ゆうこう)な契約(けいやく)が必要(ひつよう)です。
+              </div>
             ) : (
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-1">Select Policy</label>
+                  <label className="block text-sm font-medium text-slate-700 mb-1">选择保单 / Select Policy / 契約選択(けいやくせんたく)</label>
                   <select 
-                    className="w-full bg-white border-slate-300 rounded-lg p-2 border"
+                    className="w-full bg-white border-slate-300 rounded-lg p-2 border text-sm"
                     value={selectedPolicyId}
                     onChange={(e) => setSelectedPolicyId(e.target.value)}
                   >
-                    <option value="">-- Select a Policy --</option>
+                    <option value="">-- Select --</option>
                     {activePolicies.map(p => (
                       <option key={p.id} value={p.id}>{p.productName} ({p.id})</option>
                     ))}
                   </select>
                 </div>
                 <div>
-                   <label className="block text-sm font-medium text-slate-700 mb-1">Incident Description (Jiko Jokyo)</label>
-                   <p className="text-xs text-slate-500 mb-2">Describe what happened, when, and where. Include medical details if applicable.</p>
+                   <label className="block text-sm font-medium text-slate-700 mb-1">事故描述 / Description / 事故状況(じこじょうきょう)</label>
+                   <p className="text-xs text-slate-500 mb-2">描述时间、地点和经过。<br/>Describe when, where, and what happened.<br/>いつ、どこで、何(なに)があったか。</p>
                    <textarea 
-                     className="w-full bg-white border-slate-300 rounded-lg p-2 border h-32"
-                     placeholder="Example: I was hospitalized for 5 days due to appendicitis surgery starting from last Monday..."
+                     className="w-full bg-white border-slate-300 rounded-lg p-2 border h-32 text-sm"
+                     placeholder="e.g. Last Monday, I was hospitalized for surgery... / 上周一住院手术... / 先週(せんしゅう)の月曜(げつよう)に入院(にゅういん)..."
                      value={incidentDesc}
                      onChange={(e) => setIncidentDesc(e.target.value)}
                    />
@@ -503,7 +553,10 @@ const ClaimsView: React.FC<{ policies: Policy[]; addClaim: (c: Claim) => void; c
                   className="w-full py-3 bg-red-600 text-white rounded-lg font-bold hover:bg-red-700 disabled:opacity-50 flex justify-center items-center gap-2"
                 >
                   {processing ? <Loader2 className="animate-spin" /> : <AlertTriangle className="w-5 h-5" />}
-                  Submit to Assessment Dept
+                  <span className="flex flex-col items-center leading-none">
+                    <span>提交给理赔部 / Submit to Assessment</span>
+                    <span className="text-[10px] font-normal opacity-80">査定部(さていぶ)へ送信(そうしん)</span>
+                  </span>
                 </button>
               </div>
             )}
@@ -512,10 +565,10 @@ const ClaimsView: React.FC<{ policies: Policy[]; addClaim: (c: Claim) => void; c
 
        {/* History */}
        <div className="flex flex-col h-full">
-         <h2 className="text-3xl font-bold text-slate-900 mb-6">Claims History</h2>
-         <div className="space-y-4 flex-1 overflow-y-auto pr-2">
+         <h2 className="text-2xl font-bold text-slate-900 mb-6">理赔记录 / History / 請求履歴(せいきゅうりれき)</h2>
+         <div className="space-y-4 flex-1 overflow-y-auto pr-2 max-h-[600px]">
             {claims.length === 0 ? (
-               <div className="text-slate-400 text-center mt-10">No claims submitted yet.</div>
+               <div className="text-slate-400 text-center mt-10 text-sm">暂无记录 / No claims / 履歴(りれき)なし</div>
             ) : (
               claims.map((claim) => (
                 <div key={claim.id} className="bg-white p-5 rounded-xl shadow-sm border border-slate-200">
@@ -528,20 +581,20 @@ const ClaimsView: React.FC<{ policies: Policy[]; addClaim: (c: Claim) => void; c
                       {claim.status}
                     </span>
                   </div>
-                  <p className="text-sm text-slate-800 font-medium mb-2">Incident: {claim.incidentDescription}</p>
+                  <p className="text-xs sm:text-sm text-slate-800 font-medium mb-2 line-clamp-2">Case: {claim.incidentDescription}</p>
                   
                   {claim.assessmentResult && (
                     <div className="mt-3 bg-slate-50 p-3 rounded text-sm">
-                      <p className="font-bold text-slate-700 mb-1">Assessment Result:</p>
-                      <p className="text-slate-600 mb-2">{claim.assessmentResult}</p>
+                      <p className="font-bold text-slate-700 mb-1 text-xs">评估结果 / Result / 査定結果(さていけっか):</p>
+                      <p className="text-slate-600 mb-2 text-xs leading-relaxed">{claim.assessmentResult}</p>
                       {claim.status === 'Approved' && (
-                        <div className="flex items-center gap-2 text-green-600 font-bold border-t border-slate-200 pt-2">
+                        <div className="flex items-center gap-2 text-green-600 font-bold border-t border-slate-200 pt-2 text-sm">
                           <CheckCircle2 className="w-5 h-5" />
                           Payout: ¥{claim.payoutAmount?.toLocaleString()}
                         </div>
                       )}
                       {claim.status === 'Denied' && (
-                        <div className="flex items-center gap-2 text-red-600 font-bold border-t border-slate-200 pt-2">
+                        <div className="flex items-center gap-2 text-red-600 font-bold border-t border-slate-200 pt-2 text-sm">
                           <XCircle className="w-5 h-5" />
                           Payout: ¥0
                         </div>
@@ -573,7 +626,7 @@ function App() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-900 font-sans">
+    <div className="min-h-screen bg-slate-50 text-slate-900 font-sans pb-10">
       <Navbar currentView={view} setView={setView} />
       
       <main className="animate-fade-in">
@@ -585,10 +638,22 @@ function App() {
         {view === 'CLAIMS_CENTER' && <ClaimsView policies={policies} addClaim={addClaim} claims={claims} />}
       </main>
 
-      <footer className="bg-slate-900 text-slate-400 py-8 mt-12">
+      <footer className="bg-slate-900 text-slate-400 py-8 mt-12 border-t border-slate-800">
         <div className="max-w-7xl mx-auto px-4 text-center">
-          <p className="mb-2">Nihon Hoken Academy - Educational Purpose Only</p>
-          <p className="text-sm text-slate-600">Powered by Gemini AI. Not real financial advice.</p>
+          <p className="mb-2 font-bold text-slate-300">日本保险学院 / Nihon Hoken Academy / 日本保険(にほんほけん)アカデミー</p>
+          <p className="text-xs text-slate-500 mb-4">Powered by Gemini AI. Educational use only.<br/>教育目的のみ。実際の金融アドバイスではありません。</p>
+          
+          <div className="mt-6 pt-6 border-t border-slate-800 flex justify-center items-center gap-2 text-xs">
+            <span className="text-slate-500">Friend Link / 友情链接 / リンク:</span>
+            <a 
+              href="https://my-portfolio-beige-five-56.vercel.app/" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="text-blue-400 hover:text-blue-300 transition-colors font-medium flex items-center gap-1"
+            >
+              千葉２狗 🐶
+            </a>
+          </div>
         </div>
       </footer>
     </div>

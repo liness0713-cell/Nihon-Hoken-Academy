@@ -1,24 +1,42 @@
+
 import { GoogleGenAI, Type } from "@google/genai";
 import { Policy } from "../types";
 
 const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
 const MODEL_NAME = 'gemini-2.5-flash';
 
+// Helper to enforce language format
+const LANGUAGE_INSTRUCTION = `
+IMPORTANT OUTPUT FORMAT:
+All text fields sent to the user MUST be provided in three languages separated by slashes or newlines:
+1. Chinese (Simplified)
+2. English
+3. Japanese (with Furigana/Reading for Kanji in parentheses immediately following the Kanji).
+
+Example Format: 
+"终身保险 / Whole Life Insurance / 終身保険(しゅうしんほけん)"
+"保费 / Premium / 保険料(ほけんりょう)"
+`;
+
 // 1. Generate Product Knowledge
 export const getInsuranceExplanation = async (topic: string): Promise<string> => {
   try {
     const response = await ai.models.generateContent({
       model: MODEL_NAME,
-      contents: `You are a Japanese Insurance Expert. Explain the concept of "${topic}" in the context of the Japanese insurance market. 
-      Use clear, professional markdown. 
-      Explain key terms like "Hokenryo" (Premium), "Hokenkin" (Benefit), "Kaiyaku Henreikin" (Surrender Value) if applicable.
-      Keep it educational and concise (under 300 words).
-      Output language: Chinese (Simulating a learning site for Chinese speakers learning Japanese insurance).`,
+      contents: `You are a Japanese Insurance Expert. Explain the concept of "${topic}" in the context of the Japanese insurance market.
+      
+      ${LANGUAGE_INSTRUCTION}
+      
+      Structure the response as valid Markdown.
+      Use clear sections. 
+      Explain key terms like "Hokenryo" (Premium), "Hokenkin" (Benefit), "Kaiyaku Henreikin" (Surrender Value) if applicable in the trilingual format.
+      Keep it educational and concise (under 400 words total).
+      `,
     });
     return response.text || "Unable to generate explanation.";
   } catch (error) {
     console.error("Gemini Error:", error);
-    return "AI Service temporarily unavailable.";
+    return "AI Service temporarily unavailable / AI服务暂时不可用 / AIサービスは一時的(いちじてき)に利用(りよう)できません";
   }
 };
 
@@ -42,10 +60,13 @@ export const generateProposal = async (
       Interested in: ${category}.
       Specific Needs: ${needs}.
       
-      Generate a realistic plan name (e.g., "Future Yell", "Medical Prime").
-      Estimate a monthly premium in JPY.
-      Describe coverage (Death benefit, Hospitalization per day, Surgery, etc.).
-      Provide short advice on why this fits.
+      ${LANGUAGE_INSTRUCTION}
+
+      Generate:
+      1. planName: A creative name in "Chinese / English / Japanese(Kana)" format.
+      2. premium: Estimated monthly premium in JPY (number only).
+      3. coverageDetails: Bullet points of benefits. Each point must be "CN / EN / JP(Kana)".
+      4. advice: Why this fits. Must be "CN / EN / JP(Kana)".
       `,
       config: {
         responseMimeType: "application/json",
@@ -54,8 +75,8 @@ export const generateProposal = async (
           properties: {
             planName: { type: Type.STRING },
             premium: { type: Type.INTEGER, description: "Monthly premium in JPY" },
-            coverageDetails: { type: Type.STRING, description: "Summary of benefits" },
-            advice: { type: Type.STRING },
+            coverageDetails: { type: Type.STRING, description: "Trilingual Summary of benefits" },
+            advice: { type: Type.STRING, description: "Trilingual Advice" },
           },
           required: ["planName", "premium", "coverageDetails", "advice"],
         },
@@ -68,10 +89,10 @@ export const generateProposal = async (
   } catch (error) {
     console.error("Gemini Proposal Error:", error);
     return {
-      planName: "Standard Plan",
+      planName: "标准计划 / Standard Plan / 標準(ひょうじゅん)プラン",
       premium: 5000,
-      coverageDetails: "Basic coverage due to error.",
-      advice: "Please retry later.",
+      coverageDetails: "基础保障 / Basic coverage / 基本保障(きほんほしょう)",
+      advice: "请稍后重试 / Please retry later / 後(あと)で再試行(さいしこう)してください",
     };
   }
 };
@@ -101,7 +122,10 @@ export const adjudicateClaim = async (
       Task:
       Determine if this incident is covered by the policy.
       If Approved, determine a realistic payout amount in JPY based on the coverage string.
-      If Denied, explain why based on standard exclusions (e.g., intentional act, pre-existing condition, not covered category).
+      If Denied, explain why.
+
+      ${LANGUAGE_INSTRUCTION}
+      The 'reasoning' field MUST be in "CN / EN / JP(Kana)" format.
       
       Output JSON.
     `;
@@ -131,7 +155,7 @@ export const adjudicateClaim = async (
     return {
       status: 'Denied',
       amount: 0,
-      reasoning: "System error during assessment. Please contact support.",
+      reasoning: "系统错误 / System error / システムエラー",
     };
   }
 };
