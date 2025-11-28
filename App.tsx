@@ -18,6 +18,57 @@ import {
   Loader2
 } from 'lucide-react';
 
+// --- Utility Components for Ruby Text ---
+
+const RubySegment: React.FC<{ text: string }> = ({ text }) => {
+  // Regex matches Kanji (and iteration marks) followed by Kana in parentheses
+  // \u4e00-\u9faf\u3005: Kanji & Iteration mark
+  // \u3040-\u309f\u30a0-\u30ff: Hiragana & Katakana
+  const rubyRegex = /([\u4e00-\u9faf\u3005]+)\s*\(([ \u3040-\u309f\u30a0-\u30ff]+)\)/g;
+  
+  const parts = [];
+  let lastIndex = 0;
+  let match;
+  
+  while ((match = rubyRegex.exec(text)) !== null) {
+    if (match.index > lastIndex) {
+      parts.push(text.substring(lastIndex, match.index));
+    }
+    parts.push(
+      <ruby key={match.index}>
+         {match[1]}
+         <rt className="text-[0.6em] text-slate-500 font-normal">{match[2]}</rt>
+      </ruby>
+    );
+    lastIndex = rubyRegex.lastIndex;
+  }
+  
+  if (lastIndex < text.length) {
+    parts.push(text.substring(lastIndex));
+  }
+  
+  return <>{parts}</>;
+};
+
+const FormattedText: React.FC<{ text: React.ReactNode; className?: string }> = ({ text, className }) => {
+  if (text === null || text === undefined) return null;
+  if (typeof text !== 'string') return <span className={className}>{text}</span>;
+  
+  // Split by <br> tags or newlines to handle line breaks
+  const segments = text.split(/(?:<br\s*\/?>|\n)/g);
+  
+  return (
+    <span className={className}>
+      {segments.map((segment, i) => (
+        <React.Fragment key={i}>
+          {i > 0 && <br />}
+          <RubySegment text={segment} />
+        </React.Fragment>
+      ))}
+    </span>
+  );
+};
+
 // --- Sub-components ---
 
 // 1. Navigation Bar
@@ -30,7 +81,7 @@ const Navbar: React.FC<{ currentView: ViewState; setView: (v: ViewState) => void
           <div className="flex flex-col">
             <span className="font-bold text-lg tracking-wide leading-tight">日本保险学院</span>
             <span className="text-xs text-slate-400">Nihon Hoken Academy</span>
-            <span className="text-[10px] text-slate-500">日本保険(にほんほけん)アカデミー</span>
+            <span className="text-[10px] text-slate-500"><FormattedText text="日本保険(にほんほけん)アカデミー" /></span>
           </div>
         </div>
         <div className="hidden md:block">
@@ -79,8 +130,8 @@ const NavButton: React.FC<{ title: string; sub: string; active: boolean; onClick
       active ? 'bg-blue-700 text-white' : 'text-slate-300 hover:bg-slate-800 hover:text-white'
     }`}
   >
-    <span>{title}</span>
-    <span className="text-[10px] opacity-70">{sub}</span>
+    <span><FormattedText text={title} /></span>
+    <span className="text-[10px] opacity-70"><FormattedText text={sub} /></span>
   </button>
 );
 
@@ -94,27 +145,27 @@ const HomeView: React.FC<{ setView: (v: ViewState) => void }> = ({ setView }) =>
         <h1 className="text-3xl sm:text-5xl font-extrabold tracking-tight mb-4 flex flex-col gap-2">
           <span>体验日本保险</span>
           <span className="text-2xl sm:text-3xl font-light text-blue-200">Experience Japanese Insurance</span>
-          <span className="text-xl sm:text-2xl text-blue-400">日本(にほん)の保険(ほけん)を体験(たいけん)しよう</span>
+          <span className="text-xl sm:text-2xl text-blue-400"><FormattedText text="日本(にほん)の保険(ほけん)を体験(たいけん)しよう" /></span>
         </h1>
-        <p className="max-w-3xl text-base sm:text-lg text-slate-300 mb-8 leading-relaxed">
-          一个全互动的日本保险市场模拟器。学习产品，模拟核保，管理保单，并通过AI体验理赔流程。<br/>
+        <div className="max-w-3xl text-base sm:text-lg text-slate-300 mb-8 leading-relaxed">
+          <FormattedText text={`一个全互动的日本保险市场模拟器。学习产品，模拟核保，管理保单，并通过AI体验理赔流程。<br/>
           A fully interactive simulator. Learn, simulate underwriting, manage policies, and experience claims with AI.<br/>
-          完全(かんぜん)対話型(たいわがた)のシミュレーター。商品(しょうひん)を学(まな)び、引受(ひきうけ)を試算(しさん)し、AIで請求(せいきゅう)を体験(たいけん)しましょう。
-        </p>
+          完全(かんぜん)対話型(たいわがた)のシミュレーター。商品(しょうひん)を学(まな)び、引受(ひきうけ)を試算(しさん)し、AIで請求(せいきゅう)を体験(たいけん)しましょう。`} />
+        </div>
         <div className="flex flex-wrap justify-center gap-4">
           <button 
             onClick={() => setView('PRODUCTS')}
             className="px-8 py-3 bg-blue-600 hover:bg-blue-500 rounded-full font-bold shadow-lg transition-transform hover:-translate-y-1 flex flex-col items-center"
           >
             <span>开始学习 / Start</span>
-            <span className="text-xs font-normal opacity-80">学習(がくしゅう)を始(はじ)める</span>
+            <span className="text-xs font-normal opacity-80"><FormattedText text="学習(がくしゅう)を始(はじ)める" /></span>
           </button>
           <button 
             onClick={() => setView('SIMULATION')}
             className="px-8 py-3 bg-white text-blue-900 hover:bg-slate-100 rounded-full font-bold shadow-lg transition-transform hover:-translate-y-1 flex flex-col items-center"
           >
             <span>获取报价 / Quote</span>
-            <span className="text-xs font-normal opacity-80">見積(みつ)もりをとる</span>
+            <span className="text-xs font-normal opacity-80"><FormattedText text="見積(みつ)もりをとる" /></span>
           </button>
         </div>
       </div>
@@ -148,8 +199,10 @@ const FeatureCard: React.FC<{ icon: React.ReactNode; title: string; desc: string
     <div className="mb-4 bg-slate-50 w-14 h-14 rounded-full flex items-center justify-center">
       {icon}
     </div>
-    <h3 className="text-lg font-bold text-slate-900 mb-2 leading-snug">{title}</h3>
-    <p className="text-sm text-slate-600 leading-relaxed" dangerouslySetInnerHTML={{__html: desc}} />
+    <h3 className="text-lg font-bold text-slate-900 mb-2 leading-snug"><FormattedText text={title} /></h3>
+    <p className="text-sm text-slate-600 leading-relaxed">
+      <FormattedText text={desc} />
+    </p>
   </div>
 );
 
@@ -157,8 +210,8 @@ const FeatureCard: React.FC<{ icon: React.ReactNode; title: string; desc: string
 const ProductsView: React.FC = () => (
   <div className="max-w-7xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
     <div className="mb-8">
-      <h2 className="text-2xl font-bold text-slate-900">保险产品列表 / Insurance Products / 商品一覧(しょうひんいちらん)</h2>
-      <p className="text-slate-600 mt-2">浏览日本市场现有的保险类型。<br/>Browse available insurance types.<br/>日本市場(にほんしじょう)の保険(ほけん)タイプを閲覧(えつらん)。</p>
+      <h2 className="text-2xl font-bold text-slate-900"><FormattedText text="保险产品列表 / Insurance Products / 商品一覧(しょうひんいちらん)" /></h2>
+      <p className="text-slate-600 mt-2"><FormattedText text="浏览日本市场现有的保险类型。<br/>Browse available insurance types.<br/>日本市場(にほんしじょう)の保険(ほけん)タイプを閲覧(えつらん)。" /></p>
     </div>
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
       {MOCK_PRODUCTS.map((prod) => (
@@ -168,13 +221,15 @@ const ProductsView: React.FC = () => (
               {CATEGORY_ICONS[prod.category]}
               <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">{prod.category.split('/')[2]}</span>
             </div>
-            <h3 className="text-lg font-bold text-slate-900 mb-2 leading-snug">{prod.name}</h3>
-            <p className="text-sm text-slate-600 mb-4 h-auto min-h-[3rem]">{prod.description}</p>
+            <h3 className="text-lg font-bold text-slate-900 mb-2 leading-snug"><FormattedText text={prod.name} /></h3>
+            <div className="text-sm text-slate-600 mb-4 h-auto min-h-[3rem]">
+              <FormattedText text={prod.description} />
+            </div>
             <div className="space-y-3 mb-6">
               {prod.coveragePoints.map((pt, idx) => (
                 <div key={idx} className="flex items-start text-xs text-slate-700">
                   <CheckCircle2 className="w-4 h-4 text-green-500 mr-2 mt-0.5 flex-shrink-0" />
-                  <span>{pt}</span>
+                  <span><FormattedText text={pt} /></span>
                 </div>
               ))}
             </div>
@@ -209,7 +264,7 @@ const LearnView: React.FC = () => {
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-8">
-      <h2 className="text-2xl font-bold text-slate-900 mb-6">保险知识库 / Knowledge Base / 保険(ほけん)知識(ちしき)</h2>
+      <h2 className="text-2xl font-bold text-slate-900 mb-6"><FormattedText text="保险知识库 / Knowledge Base / 保険(ほけん)知識(ちしき)" /></h2>
       <div className="bg-white p-8 rounded-2xl shadow-lg border border-slate-200">
         <div className="flex gap-4 mb-6 flex-col sm:flex-row">
           <input 
@@ -226,7 +281,7 @@ const LearnView: React.FC = () => {
             className="px-6 py-3 bg-blue-600 text-white rounded-lg font-bold hover:bg-blue-700 disabled:opacity-50 flex items-center justify-center gap-2 whitespace-nowrap"
           >
             {loading ? <Loader2 className="animate-spin" /> : <Search className="w-5 h-5" />}
-            <span>问AI / Ask / 質問(しつもん)</span>
+            <span><FormattedText text="问AI / Ask / 質問(しつもん)" /></span>
           </button>
         </div>
         
@@ -237,7 +292,7 @@ const LearnView: React.FC = () => {
                 onClick={() => setTopic(t.split(' / ')[0])}
                 className="px-3 py-1.5 bg-slate-100 text-slate-600 text-xs rounded-full hover:bg-slate-200 border border-slate-200 transition-colors text-left"
               >
-                {t}
+                <FormattedText text={t} />
               </button>
             ))}
         </div>
@@ -246,10 +301,10 @@ const LearnView: React.FC = () => {
           <div className="mt-8 p-6 bg-slate-50 rounded-xl border border-slate-200 prose prose-blue max-w-none">
              <h3 className="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
                 <BookOpen className="w-5 h-5 text-blue-600"/>
-                AI 解说 / AI Explanation / AI解説(かいせつ)
+                <FormattedText text="AI 解说 / AI Explanation / AI解説(かいせつ)" />
              </h3>
              <div className="whitespace-pre-line text-slate-700 leading-relaxed text-sm">
-               {explanation}
+               <FormattedText text={explanation} />
              </div>
           </div>
         )}
@@ -294,10 +349,10 @@ const SimulationView: React.FC<{ addPolicy: (p: Policy) => void; setView: (v: Vi
   return (
     <div className="max-w-5xl mx-auto px-4 py-8 grid grid-cols-1 lg:grid-cols-2 gap-8">
       <div>
-        <h2 className="text-2xl font-bold text-slate-900 mb-6">保费试算 / Get a Quote / 試算(しさん)</h2>
+        <h2 className="text-2xl font-bold text-slate-900 mb-6"><FormattedText text="保费试算 / Get a Quote / 試算(しさん)" /></h2>
         <div className="bg-white p-6 rounded-2xl shadow-md border border-slate-200 space-y-4">
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">保险类别 / Category / 保険種類(ほけんしゅるい)</label>
+            <label className="block text-sm font-medium text-slate-700 mb-1"><FormattedText text="保险类别 / Category / 保険種類(ほけんしゅるい)" /></label>
             <select 
               className="w-full bg-white border-slate-300 rounded-lg p-2 border focus:ring-blue-500 text-sm"
               value={formData.category}
@@ -308,7 +363,7 @@ const SimulationView: React.FC<{ addPolicy: (p: Policy) => void; setView: (v: Vi
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">年龄 / Age / 年齢(ねんれい)</label>
+              <label className="block text-sm font-medium text-slate-700 mb-1"><FormattedText text="年龄 / Age / 年齢(ねんれい)" /></label>
               <input 
                 type="number" 
                 className="w-full bg-white border-slate-300 rounded-lg p-2 border" 
@@ -317,7 +372,7 @@ const SimulationView: React.FC<{ addPolicy: (p: Policy) => void; setView: (v: Vi
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">性别 / Gender / 性別(せいべつ)</label>
+              <label className="block text-sm font-medium text-slate-700 mb-1"><FormattedText text="性别 / Gender / 性別(せいべつ)" /></label>
               <select 
                 className="w-full bg-white border-slate-300 rounded-lg p-2 border text-sm"
                 value={formData.gender}
@@ -329,7 +384,7 @@ const SimulationView: React.FC<{ addPolicy: (p: Policy) => void; setView: (v: Vi
             </div>
           </div>
           <div>
-             <label className="block text-sm font-medium text-slate-700 mb-1">需求与顾虑 / Needs / ニーズ・懸念(けねん)</label>
+             <label className="block text-sm font-medium text-slate-700 mb-1"><FormattedText text="需求与顾虑 / Needs / ニーズ・懸念(けねん)" /></label>
              <textarea 
                className="w-full bg-white border-slate-300 rounded-lg p-2 border h-24 text-sm"
                value={formData.needs}
@@ -345,7 +400,7 @@ const SimulationView: React.FC<{ addPolicy: (p: Policy) => void; setView: (v: Vi
             {loading ? <Loader2 className="animate-spin" /> : <FileText className="w-5 h-5" />}
             <span className="flex flex-col items-center leading-none text-sm">
               <span>生成计划 / Generate Plan</span>
-              <span className="text-[10px] font-normal opacity-80">プランを作成(さくせい)</span>
+              <span className="text-[10px] font-normal opacity-80"><FormattedText text="プランを作成(さくせい)" /></span>
             </span>
           </button>
         </div>
@@ -356,19 +411,19 @@ const SimulationView: React.FC<{ addPolicy: (p: Policy) => void; setView: (v: Vi
          {proposal ? (
            <div className="bg-white p-6 rounded-2xl shadow-xl border-t-4 border-blue-500 flex-1 flex flex-col animate-fade-in">
              <div className="mb-4">
-               <span className="text-xs font-bold text-blue-600 bg-blue-50 px-2 py-1 rounded uppercase tracking-wide">建议方案 / Proposal / 提案(ていあん)</span>
-               <h3 className="text-xl font-bold text-slate-900 mt-2">{proposal.planName}</h3>
+               <span className="text-xs font-bold text-blue-600 bg-blue-50 px-2 py-1 rounded uppercase tracking-wide"><FormattedText text="建议方案 / Proposal / 提案(ていあん)" /></span>
+               <h3 className="text-xl font-bold text-slate-900 mt-2"><FormattedText text={proposal.planName} /></h3>
                <p className="text-3xl font-bold text-slate-900 mt-4">¥{proposal.premium.toLocaleString()} <span className="text-sm font-normal text-slate-500">/ 月 (Month/月)</span></p>
              </div>
              
              <div className="space-y-4 mb-8 flex-1 overflow-y-auto max-h-80">
                <div className="p-4 bg-slate-50 rounded-lg">
-                 <h4 className="font-semibold text-slate-800 mb-2 text-sm">保障亮点 / Coverage / 保障内容(ほしょうないよう)</h4>
-                 <p className="text-sm text-slate-600 whitespace-pre-wrap leading-relaxed">{proposal.coverageDetails}</p>
+                 <h4 className="font-semibold text-slate-800 mb-2 text-sm"><FormattedText text="保障亮点 / Coverage / 保障内容(ほしょうないよう)" /></h4>
+                 <p className="text-sm text-slate-600 whitespace-pre-wrap leading-relaxed"><FormattedText text={proposal.coverageDetails} /></p>
                </div>
                <div className="p-4 bg-yellow-50 rounded-lg border border-yellow-100">
-                 <h4 className="font-semibold text-yellow-800 mb-2 text-sm">AI 顾问 / Advisor / AIアドバイザー</h4>
-                 <p className="text-sm text-yellow-700 italic leading-relaxed">"{proposal.advice}"</p>
+                 <h4 className="font-semibold text-yellow-800 mb-2 text-sm"><FormattedText text="AI 顾问 / Advisor / AIアドバイザー" /></h4>
+                 <p className="text-sm text-yellow-700 italic leading-relaxed">"<FormattedText text={proposal.advice} />"</p>
                </div>
              </div>
 
@@ -377,14 +432,14 @@ const SimulationView: React.FC<{ addPolicy: (p: Policy) => void; setView: (v: Vi
                className="w-full py-3 bg-green-600 text-white rounded-lg font-bold hover:bg-green-700 shadow-lg transform transition hover:-translate-y-1 flex flex-col items-center justify-center leading-none gap-1"
              >
                <span>申请投保 / Apply</span>
-               <span className="text-xs font-normal opacity-80">申(もう)し込(こ)む</span>
+               <span className="text-xs font-normal opacity-80"><FormattedText text="申(もう)し込(こ)む" /></span>
              </button>
            </div>
          ) : (
            <div className="h-full bg-slate-100 rounded-2xl border-2 border-dashed border-slate-300 flex items-center justify-center text-slate-400 p-8 text-center text-sm">
-             运行模拟以查看量身定制的保险建议。<br/>
+             <FormattedText text={`运行模拟以查看量身定制的保险建议。<br/>
              Run simulation to see proposal.<br/>
-             シミュレーションを実行(じっこう)して提案(ていあん)を見(み)る。
+             シミュレーションを実行(じっこう)して提案(ていあん)を見(み)る。`} />
            </div>
          )}
       </div>
@@ -397,11 +452,11 @@ const MyPageView: React.FC<{ policies: Policy[] }> = ({ policies }) => (
   <div className="max-w-6xl mx-auto px-4 py-8">
      <div className="flex flex-col sm:flex-row justify-between items-end mb-8 gap-4">
       <div>
-        <h2 className="text-2xl font-bold text-slate-900">我的主页 / My Page / マイページ</h2>
-        <p className="text-slate-600 mt-1 text-sm">管理您的有效合同和手续。<br/>Manage active contracts.<br/>契約(けいやく)と手続(てつづ)きを管理(かんり)。</p>
+        <h2 className="text-2xl font-bold text-slate-900"><FormattedText text="我的主页 / My Page / マイページ" /></h2>
+        <p className="text-slate-600 mt-1 text-sm"><FormattedText text="管理您的有效合同和手续。<br/>Manage active contracts.<br/>契約(けいやく)と手続(てつづ)きを管理(かんり)。" /></p>
       </div>
       <div className="text-right bg-slate-100 p-4 rounded-lg">
-        <p className="text-xs text-slate-500">月保费总额 / Total Monthly / 月額合計(げつがくごうけい)</p>
+        <p className="text-xs text-slate-500"><FormattedText text="月保费总额 / Total Monthly / 月額合計(げつがくごうけい)" /></p>
         <p className="text-2xl font-bold text-slate-900">
           ¥{policies.reduce((acc, p) => acc + (p.status === 'Active' ? p.premium : 0), 0).toLocaleString()}
         </p>
@@ -413,8 +468,8 @@ const MyPageView: React.FC<{ policies: Policy[] }> = ({ policies }) => (
         <div className="inline-block p-4 bg-slate-100 rounded-full mb-4">
           <FileText className="w-8 h-8 text-slate-400" />
         </div>
-        <h3 className="text-lg font-medium text-slate-900">暂无有效保单 / No Policies / 契約(けいやく)なし</h3>
-        <p className="text-slate-500">去“试算”创建新合同。<br/>Go to Simulation to create one.<br/>試算(しさん)で契約(けいやく)を作成(さくせい)。</p>
+        <h3 className="text-lg font-medium text-slate-900"><FormattedText text="暂无有效保单 / No Policies / 契約(けいやく)なし" /></h3>
+        <p className="text-slate-500"><FormattedText text="去“试算”创建新合同。<br/>Go to Simulation to create one.<br/>試算(しさん)で契約(けいやく)を作成(さくせい)。" /></p>
       </div>
     ) : (
       <div className="grid gap-6">
@@ -425,7 +480,7 @@ const MyPageView: React.FC<{ policies: Policy[] }> = ({ policies }) => (
                  <div className="flex items-center gap-3">
                    {CATEGORY_ICONS[policy.category]}
                    <div>
-                     <h3 className="text-lg font-bold text-slate-900 leading-snug">{policy.productName}</h3>
+                     <h3 className="text-lg font-bold text-slate-900 leading-snug"><FormattedText text={policy.productName} /></h3>
                      <p className="text-xs text-slate-500 font-mono">ID: {policy.id}</p>
                    </div>
                  </div>
@@ -439,38 +494,38 @@ const MyPageView: React.FC<{ policies: Policy[] }> = ({ policies }) => (
                
                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-xs sm:text-sm mt-4">
                  <div>
-                   <p className="text-slate-500 text-[10px] uppercase">被保人 / Insured / 被保険者</p>
-                   <p className="font-medium">{policy.insuredName}</p>
+                   <p className="text-slate-500 text-[10px] uppercase"><FormattedText text="被保人 / Insured / 被保険者" /></p>
+                   <p className="font-medium"><FormattedText text={policy.insuredName} /></p>
                  </div>
                  <div>
-                   <p className="text-slate-500 text-[10px] uppercase">受益人 / Beneficiary / 受取人</p>
-                   <p className="font-medium">{policy.beneficiary}</p>
+                   <p className="text-slate-500 text-[10px] uppercase"><FormattedText text="受益人 / Beneficiary / 受取人" /></p>
+                   <p className="font-medium"><FormattedText text={policy.beneficiary} /></p>
                  </div>
                  <div>
-                   <p className="text-slate-500 text-[10px] uppercase">月保费 / Premium / 保険料</p>
+                   <p className="text-slate-500 text-[10px] uppercase"><FormattedText text="月保费 / Premium / 保険料" /></p>
                    <p className="font-medium">¥{policy.premium.toLocaleString()}</p>
                  </div>
                  <div>
-                    <p className="text-slate-500 text-[10px] uppercase">生效日 / Start / 開始日</p>
+                    <p className="text-slate-500 text-[10px] uppercase"><FormattedText text="生效日 / Start / 開始日" /></p>
                     <p className="font-medium">{policy.startDate}</p>
                  </div>
                </div>
                
                <div className="mt-4 pt-4 border-t border-slate-100">
-                 <p className="text-xs text-slate-500 mb-1">保障内容 / Coverage Details / 保障内容</p>
-                 <p className="text-sm text-slate-700 whitespace-pre-wrap">{policy.specialConditions}</p>
+                 <p className="text-xs text-slate-500 mb-1"><FormattedText text="保障内容 / Coverage Details / 保障内容" /></p>
+                 <p className="text-sm text-slate-700 whitespace-pre-wrap"><FormattedText text={policy.specialConditions} /></p>
                </div>
              </div>
              
              <div className="bg-slate-50 p-6 flex flex-col justify-center gap-2 border-l border-slate-100 min-w-[220px]">
                 <button className="w-full py-2 px-4 bg-white border border-slate-300 text-slate-700 rounded text-xs hover:bg-slate-50 font-medium text-left">
-                  地址变更 / Address Change<br/>住所変更(じゅうしょへんこう)
+                  <FormattedText text={`地址变更 / Address Change<br/>住所変更(じゅうしょへんこう)`} />
                 </button>
                 <button className="w-full py-2 px-4 bg-white border border-slate-300 text-slate-700 rounded text-xs hover:bg-slate-50 font-medium text-left">
-                  受益人变更 / Beneficiary Change<br/>受取人変更(うけとりにんへんこう)
+                  <FormattedText text={`受益人变更 / Beneficiary Change<br/>受取人変更(うけとりにんへんこう)`} />
                 </button>
                 <button className="w-full py-2 px-4 bg-white border border-slate-300 text-slate-700 rounded text-xs hover:bg-slate-50 font-medium text-red-600 hover:text-red-700 hover:border-red-200 text-left">
-                   解约 / Surrender<br/>解約(かいやく)
+                   <FormattedText text={`解约 / Surrender<br/>解約(かいやく)`} />
                 </button>
              </div>
           </div>
@@ -516,16 +571,16 @@ const ClaimsView: React.FC<{ policies: Policy[]; addClaim: (c: Claim) => void; c
     <div className="max-w-6xl mx-auto px-4 py-8 grid grid-cols-1 lg:grid-cols-2 gap-8">
        {/* Submission Form */}
        <div>
-         <h2 className="text-2xl font-bold text-slate-900 mb-6">申请理赔 / File Claim / 事故報告(じこほうこく)</h2>
+         <h2 className="text-2xl font-bold text-slate-900 mb-6"><FormattedText text="申请理赔 / File Claim / 事故報告(じこほうこく)" /></h2>
          <div className="bg-white p-6 rounded-2xl shadow-md border border-slate-200">
             {activePolicies.length === 0 ? (
               <div className="text-center py-8 text-slate-500 text-sm">
-                需要有效的保单才能申请理赔。<br/>Need active policy.<br/>有効(ゆうこう)な契約(けいやく)が必要(ひつよう)です。
+                <FormattedText text="需要有效的保单才能申请理赔。<br/>Need active policy.<br/>有効(ゆうこう)な契約(けいやく)が必要(ひつよう)です。" />
               </div>
             ) : (
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-1">选择保单 / Select Policy / 契約選択(けいやくせんたく)</label>
+                  <label className="block text-sm font-medium text-slate-700 mb-1"><FormattedText text="选择保单 / Select Policy / 契約選択(けいやくせんたく)" /></label>
                   <select 
                     className="w-full bg-white border-slate-300 rounded-lg p-2 border text-sm"
                     value={selectedPolicyId}
@@ -538,8 +593,8 @@ const ClaimsView: React.FC<{ policies: Policy[]; addClaim: (c: Claim) => void; c
                   </select>
                 </div>
                 <div>
-                   <label className="block text-sm font-medium text-slate-700 mb-1">事故描述 / Description / 事故状況(じこじょうきょう)</label>
-                   <p className="text-xs text-slate-500 mb-2">描述时间、地点和经过。<br/>Describe when, where, and what happened.<br/>いつ、どこで、何(なに)があったか。</p>
+                   <label className="block text-sm font-medium text-slate-700 mb-1"><FormattedText text="事故描述 / Description / 事故状況(じこじょうきょう)" /></label>
+                   <p className="text-xs text-slate-500 mb-2"><FormattedText text="描述时间、地点和经过。<br/>Describe when, where, and what happened.<br/>いつ、どこで、何(なに)があったか。" /></p>
                    <textarea 
                      className="w-full bg-white border-slate-300 rounded-lg p-2 border h-32 text-sm"
                      placeholder="e.g. Last Monday, I was hospitalized for surgery... / 上周一住院手术... / 先週(せんしゅう)の月曜(げつよう)に入院(にゅういん)..."
@@ -555,7 +610,7 @@ const ClaimsView: React.FC<{ policies: Policy[]; addClaim: (c: Claim) => void; c
                   {processing ? <Loader2 className="animate-spin" /> : <AlertTriangle className="w-5 h-5" />}
                   <span className="flex flex-col items-center leading-none">
                     <span>提交给理赔部 / Submit to Assessment</span>
-                    <span className="text-[10px] font-normal opacity-80">査定部(さていぶ)へ送信(そうしん)</span>
+                    <span className="text-[10px] font-normal opacity-80"><FormattedText text="査定部(さていぶ)へ送信(そうしん)" /></span>
                   </span>
                 </button>
               </div>
@@ -565,10 +620,10 @@ const ClaimsView: React.FC<{ policies: Policy[]; addClaim: (c: Claim) => void; c
 
        {/* History */}
        <div className="flex flex-col h-full">
-         <h2 className="text-2xl font-bold text-slate-900 mb-6">理赔记录 / History / 請求履歴(せいきゅうりれき)</h2>
+         <h2 className="text-2xl font-bold text-slate-900 mb-6"><FormattedText text="理赔记录 / History / 請求履歴(せいきゅうりれき)" /></h2>
          <div className="space-y-4 flex-1 overflow-y-auto pr-2 max-h-[600px]">
             {claims.length === 0 ? (
-               <div className="text-slate-400 text-center mt-10 text-sm">暂无记录 / No claims / 履歴(りれき)なし</div>
+               <div className="text-slate-400 text-center mt-10 text-sm"><FormattedText text="暂无记录 / No claims / 履歴(りれき)なし" /></div>
             ) : (
               claims.map((claim) => (
                 <div key={claim.id} className="bg-white p-5 rounded-xl shadow-sm border border-slate-200">
@@ -585,8 +640,8 @@ const ClaimsView: React.FC<{ policies: Policy[]; addClaim: (c: Claim) => void; c
                   
                   {claim.assessmentResult && (
                     <div className="mt-3 bg-slate-50 p-3 rounded text-sm">
-                      <p className="font-bold text-slate-700 mb-1 text-xs">评估结果 / Result / 査定結果(さていけっか):</p>
-                      <p className="text-slate-600 mb-2 text-xs leading-relaxed">{claim.assessmentResult}</p>
+                      <p className="font-bold text-slate-700 mb-1 text-xs"><FormattedText text="评估结果 / Result / 査定結果(さていけっか):" /></p>
+                      <p className="text-slate-600 mb-2 text-xs leading-relaxed"><FormattedText text={claim.assessmentResult} /></p>
                       {claim.status === 'Approved' && (
                         <div className="flex items-center gap-2 text-green-600 font-bold border-t border-slate-200 pt-2 text-sm">
                           <CheckCircle2 className="w-5 h-5" />
@@ -640,11 +695,11 @@ function App() {
 
       <footer className="bg-slate-900 text-slate-400 py-8 mt-12 border-t border-slate-800">
         <div className="max-w-7xl mx-auto px-4 text-center">
-          <p className="mb-2 font-bold text-slate-300">日本保险学院 / Nihon Hoken Academy / 日本保険(にほんほけん)アカデミー</p>
+          <p className="mb-2 font-bold text-slate-300"><FormattedText text="日本保险学院 / Nihon Hoken Academy / 日本保険(にほんほけん)アカデミー" /></p>
           <p className="text-xs text-slate-500 mb-4">Powered by Gemini AI. Educational use only.<br/>教育目的のみ。実際の金融アドバイスではありません。</p>
           
           <div className="mt-6 pt-6 border-t border-slate-800 flex justify-center items-center gap-2 text-xs">
-            <span className="text-slate-500">Friend Link / 友情链接 / リンク:</span>
+            <span className="text-slate-500"><FormattedText text="Friend Link / 友情链接 / リンク:" /></span>
             <a 
               href="https://my-portfolio-beige-five-56.vercel.app/" 
               target="_blank" 
