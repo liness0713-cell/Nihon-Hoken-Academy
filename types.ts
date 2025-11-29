@@ -1,43 +1,77 @@
 
+export type MediaType = 'IMAGE' | 'VIDEO';
+
+export interface TrilingualContent {
+  cn: string;
+  en: string;
+  jp: string;
+}
+
+export interface Chapter {
+  id: string;
+  title: TrilingualContent;
+  content: TrilingualContent;
+}
+
+export interface InsuranceLesson {
+  id: string;
+  timestamp: number;
+  topic: string;
+  visualPrompt: string; 
+  mediaUrl?: string; 
+  mainTitle: TrilingualContent;
+  chapters: Chapter[];
+  relatedProductId?: string;
+}
+
 export enum InsuranceCategory {
-  LIFE = '终身保险 / Life / 生命保険(せいめいほけん)',
-  MEDICAL = '医疗保险 / Medical / 医療保険(いりょうほけん)',
-  CANCER = '癌症保险 / Cancer / がん保険(がんほけん)',
-  CAR = '汽车保险 / Car / 自動車保険(じどうしゃほけん)',
-  FIRE = '火灾保险 / Fire / 火災保険(かさいほけん)'
+  LIFE = 'LIFE',
+  MEDICAL = 'MEDICAL',
+  CANCER = 'CANCER',
+  CAR = 'CAR',
+  FIRE = 'FIRE',
+  OTHER = 'OTHER',
 }
 
 export interface InsuranceProduct {
   id: string;
-  name: string;
   category: InsuranceCategory;
-  description: string;
-  coveragePoints: string[];
+  name: TrilingualContent;
+  description: TrilingualContent;
+  coveragePoints: TrilingualContent[];
+  basePrice: number;
+}
+
+export interface SimulationResult {
+  monthlyPremium: number;
+  planName: TrilingualContent;
+  analysis: TrilingualContent; // Why this plan fits
+  visualPrompt: string; // For generating an image of the "Future Self"
 }
 
 export interface Policy {
   id: string;
+  policyNumber: string; // New: Official looking number
   productId: string;
-  productName: string;
-  category: InsuranceCategory;
-  contractorName: string; // Keiyakusha
-  insuredName: string;    // Hihokensha
-  beneficiary: string;    // Uketorinin
+  productName: TrilingualContent;
+  planName: TrilingualContent; 
+  analysis: TrilingualContent; 
+  status: 'ACTIVE' | 'EXPIRED';
+  premium: number;
   startDate: string;
-  status: 'Active' | 'Lapsed' | 'Cancelled' | 'Claimed';
-  premium: number;        // Hokenryo (Monthly)
-  coverageAmount: string; // Hokenkin amount
-  specialConditions: string; // Tokuyaku
+  expiryDate: string; // New
+  period: string; // New: "10 Years", "Lifetime", etc.
+  holderName: string; // New
+  beneficiary: string; // New
+  paymentMethod: string; // New
+  nextPaymentDate: string; // New
+  visualUrl?: string; 
 }
 
-export interface Claim {
-  id: string;
-  policyId: string;
-  dateOfIncident: string; // Jiko hassei-bi
-  incidentDescription: string;
-  status: 'Pending' | 'Approved' | 'Denied';
-  assessmentResult?: string;
-  payoutAmount?: number;
+export interface ClaimResult {
+  // Expanded statuses: APPROVED (Paid), DENIED (Rejected), UNDER_REVIEW (Accepted/Processing), NEED_MORE_INFO (Supplement)
+  status: 'APPROVED' | 'DENIED' | 'UNDER_REVIEW' | 'NEED_MORE_INFO';
+  title: TrilingualContent;
+  explanation: TrilingualContent;
+  nextSteps: TrilingualContent;
 }
-
-export type ViewState = 'HOME' | 'PRODUCTS' | 'SIMULATION' | 'MY_PAGE' | 'CLAIMS_CENTER' | 'LEARN';
