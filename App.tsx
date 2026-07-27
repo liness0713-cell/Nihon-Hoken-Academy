@@ -720,7 +720,7 @@ function App() {
 
         <footer className="mt-16 text-center text-slate-400 text-sm pb-8 border-t border-slate-100 pt-8">
           <p className="mb-2">© 2024 Nihon Hoken Academy</p>
-          <a href="https://my-portfolio-beige-five-56.vercel.app/" target="_blank" rel="noopener noreferrer" className="text-indigo-400 hover:text-indigo-600 font-medium inline-flex items-center gap-1">
+          <a href="https://blog.gyuba-chan.com/" target="_blank" rel="noopener noreferrer" className="text-indigo-400 hover:text-indigo-600 font-medium inline-flex items-center gap-1">
              千葉２狗 🐶
           </a>
         </footer>
